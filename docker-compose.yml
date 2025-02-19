@@ -1,0 +1,12 @@
+services:
+
+  tcp_perf:
+    image: tcp-perf:latest
+    ports:
+      - "80:80"
+    build:
+      context: ./tcp_perf
+    volumes:
+      - /Users/kirill/Prog/eth-research/perftools/tmp:/tmp
+    cap_add:
+      - NET_ADMIN
