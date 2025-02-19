@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "perftools"
+version = "0.1.0"
+description = "Performance testing tools"
+authors = ["Kirill Varlamov <kirill@ongrid.pro>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+netflow = "^0.12.2"
+scapy = "^2.6.1"
+matplotlib = "^3.10.0"
+numpy = "^2.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
