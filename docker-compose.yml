@@ -1,12 +1,72 @@
 services:
 
-  tcp_perf:
-    image: tcp-perf:latest
-    ports:
-      - "80:80"
+  telemetry:
+    image: telemetry:latest
+    container_name: telemetry
     build:
-      context: ./tcp_perf
+      context: ./docker_telemetry
     volumes:
-      - /Users/kirill/Prog/eth-research/perftools/tmp:/tmp
+      - /dumps:/dumps
     cap_add:
       - NET_ADMIN
+    environment:
+      - IFACE=enp7s0
+      - LIGHTHOUSE=http://127.0.0.1:5052/
+    network_mode: host
+    privileged: true
+
+  reth:
+    image: ghcr.io/paradigmxyz/reth:latest
+    container_name: reth
+    volumes:
+      - /data/reth:/root/.local/share/reth
+      - /mnt/jwt.hex:/mnt/jwt.hex
+    command:
+      - node
+      - --authrpc.addr
+      - 0.0.0.0
+      - --authrpc.port
+      - "8551"
+      - --metrics
+      - 0.0.0.0:9001
+      - --http
+      - --http.addr
+      - 0.0.0.0
+      - --http.port
+      - "8545"
+      - --http.corsdomain
+      - "*"
+      - --http.api
+      - "admin,debug,eth,net,trace,txpool,web3,rpc,reth"
+      - --ws
+      - --ws.addr
+      - 0.0.0.0
+      - --ws.port
+      - "8546"
+      - --ws.origins
+      - "*"
+    restart: on-failure
+    network_mode: host
+
+  lighthouse:
+    image: sigp/lighthouse:latest
+    container_name: lighthouse
+    volumes:
+      - /data/lighthouse:/root/.lighthouse
+      - /mnt/jwt.hex:/mnt/jwt.hex:ro
+    command:
+      - lighthouse
+      - beacon_node
+      - --checkpoint-sync-url
+      - https://beaconstate-mainnet.chainsafe.io
+      - --execution-endpoint
+      - http://127.0.0.1:8551
+      - --execution-jwt
+      - /mnt/jwt.hex
+      - --http
+      - --http-address
+      - 0.0.0.0
+      - --disable-deposit-contract-sync
+      - --libp2p-addresses
+      - /ip4/65.108.128.246/tcp/9000/p2p/16Uiu2HAm5sSeiwbLUGAYzrxhxbcCAzjejLBUsWoXz4k6HbNLJBov
+    network_mode: host

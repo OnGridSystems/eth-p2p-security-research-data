@@ -9,12 +9,11 @@ RUN apt-get update && apt-get install -y \
     tcpdump \
     iproute2 \
     iptables \
-    curl \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt-get update
+    curl
 
-# Install Python 3.13
-RUN apt-get install -y python3.13
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.13 python3-pip
 
 # Set Python 3.13 as the default python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 1
@@ -27,6 +26,9 @@ WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY ./entrypoint.py /app
+COPY ./pyproject.toml /app/
+
+RUN pip install requests
 
 ENV PYTHONUNBUFFERED=1
 # Run a command to keep the container running
